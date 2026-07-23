@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>שקילות יומיות — Coach Ofek</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --card:#12294d; --card2:#0f2244; --gold:#d4af37; --gold-soft:#e6c964;
+    --ink:#eaf1fb; --muted:#9db2d4; --line:rgba(212,175,55,.25);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Heebo',system-ui,'Segoe UI',Arial,sans-serif;
+    background:radial-gradient(1200px 700px at 50% -10%, #123057 0%, #0a1a33 55%, #071223 100%);
+    color:var(--ink); min-height:100vh; direction:rtl; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:520px;margin:0 auto;padding:34px 18px 60px}
+  .brand{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:26px}
+  .brand .mark{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--gold),#b8912b);
+    display:flex;align-items:center;justify-content:center;color:#0a1a33;font-weight:800;font-size:20px;
+    box-shadow:0 6px 18px rgba(212,175,55,.3)}
+  .brand .name{font-weight:800;letter-spacing:.4px;font-size:15px;color:var(--gold-soft)}
+  h1{font-size:27px;font-weight:800;text-align:center;margin:6px 0 2px}
+  .sub{text-align:center;color:var(--muted);font-size:15px;margin:0 0 26px}
+  .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
+    border-radius:22px;padding:24px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+  label{display:block;font-size:14px;color:var(--gold-soft);font-weight:700;margin:0 0 9px}
+  .field{margin-bottom:20px}
+  input,select{width:100%;padding:16px;border-radius:14px;border:1px solid rgba(157,178,212,.25);
+    background:#0b1e3b;color:var(--ink);font-size:19px;font-family:inherit;outline:none}
+  input:focus,select:focus{border-color:var(--gold)}
+  select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23d4af37'><path d='M8 11L3 6h10z'/></svg>");
+    background-repeat:no-repeat;background-position:left 16px center}
+  .btn{width:100%;padding:17px;border:none;border-radius:14px;cursor:pointer;
+    background:linear-gradient(135deg,var(--gold),#b8912b);color:#0a1a33;font-weight:800;font-size:19px;
+    font-family:inherit;box-shadow:0 10px 24px rgba(212,175,55,.28);margin-top:4px}
+  .btn:active{transform:translateY(1px)}
+  .btn[disabled]{opacity:.6}
+  .ok{background:rgba(46,160,110,.15);border:1px solid rgba(46,160,110,.5);color:#8fe3bd;
+    padding:15px;border-radius:12px;text-align:center;font-weight:700;margin-top:18px;display:none}
+  .err{background:rgba(220,80,80,.12);border:1px solid rgba(220,80,80,.5);color:#f2a3a3;
+    padding:15px;border-radius:12px;text-align:center;font-weight:700;margin-top:18px;display:none}
+  .foot{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><div class="mark">O</div><div class="name">COACH OFEK</div></div>
+  <h1>שקילות יומיות</h1>
+  <p class="sub" id="who">&nbsp;</p>
+  <div class="card">
+    <div class="field">
+      <label>משקל היום (ק"ג)</label>
+      <input id="weight" type="text" inputmode="decimal" placeholder="לדוגמה 63.40" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label>איך את מרגישה?</label>
+      <select id="feeling">
+        <option value="מצוינת">מצוינת</option>
+        <option value="טובה">טובה</option>
+        <option value="בסדר">בסדר</option>
+        <option value="עייפה">עייפה</option>
+        <option value="נפוחה">נפוחה</option>
+        <option value="רעבה">רעבה</option>
+      </select>
+    </div>
+    <button id="save" class="btn">שמירת שקילה</button>
+    <div id="ok" class="ok">נשמר! תודה 💛</div>
+    <div id="err" class="err">משהו השתבש, נסי שוב</div>
+  </div>
+  <p class="foot">התאריך והשעה נרשמים אוטומטית</p>
+</div>
+<script>
+  var API='https://xcvqxvokkqrvdtwoiyen.supabase.co/functions/v1/weighin';
+  var SLUG=new URLSearchParams(location.search).get('k')||'';
+  var btn=document.getElementById('save');
+  var wEl=document.getElementById('weight');
+  var fEl=document.getElementById('feeling');
+  var ok=document.getElementById('ok');
+  var err=document.getElementById('err');
+  if(!SLUG){err.textContent='הקישור אינו תקין';err.style.display='block';btn.disabled=true;}
+  btn.addEventListener('click',function(){
+    ok.style.display='none'; err.style.display='none';
+    var raw=(wEl.value||'').replace(',','.').trim();
+    var w=parseFloat(raw);
+    if(!isFinite(w)||w<=0){err.textContent='נא להזין משקל תקין';err.style.display='block';return;}
+    btn.disabled=true; btn.textContent='שומר…';
+    fetch(API+'?action=submit',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({slug:SLUG,weight:w,feeling:fEl.value})})
+    .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+    .then(function(res){
+      btn.disabled=false; btn.textContent='שמירת שקילה';
+      if(res.ok){ok.style.display='block';wEl.value='';window.scrollTo({top:0,behavior:'smooth'});}
+      else{err.textContent='משהו השתבש, נסי שוב';err.style.display='block';}
+    })
+    .catch(function(){btn.disabled=false;btn.textContent='שמירת שקילה';err.textContent='אין חיבור, נסי שוב';err.style.display='block';});
+  });
+</script>
+</body>
+</html>
