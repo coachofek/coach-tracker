@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>הכנת דף שקילות — Coach Ofek</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --card:#12294d; --card2:#0f2244; --gold:#d4af37; --gold-soft:#e6c964;
+    --ink:#eaf1fb; --muted:#9db2d4; --line:rgba(212,175,55,.25);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Heebo',system-ui,'Segoe UI',Arial,sans-serif;
+    background:radial-gradient(1200px 700px at 50% -10%, #123057 0%, #0a1a33 55%, #071223 100%);
+    color:var(--ink); min-height:100vh; direction:rtl; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:30px 18px 60px}
+  .brand{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:22px}
+  .brand .mark{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--gold),#b8912b);
+    display:flex;align-items:center;justify-content:center;color:#0a1a33;font-weight:800;font-size:20px;
+    box-shadow:0 6px 18px rgba(212,175,55,.3)}
+  .brand .name{font-weight:800;letter-spacing:.4px;font-size:15px;color:var(--gold-soft)}
+  h1{font-size:27px;font-weight:800;text-align:center;margin:6px 0 2px}
+  .sub{text-align:center;color:var(--muted);font-size:15px;margin:0 0 22px}
+  .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
+    border-radius:22px;padding:22px;box-shadow:0 18px 50px rgba(0,0,0,.35);margin-bottom:18px}
+  label{display:block;font-size:14px;color:var(--gold-soft);font-weight:700;margin:0 0 9px}
+  .field{margin-bottom:18px}
+  input,select{width:100%;padding:16px;border-radius:14px;border:1px solid rgba(157,178,212,.25);
+    background:#0b1e3b;color:var(--ink);font-size:19px;font-family:inherit;outline:none}
+  input:focus,select:focus{border-color:var(--gold)}
+  select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23d4af37'><path d='M8 11L3 6h10z'/></svg>");
+    background-repeat:no-repeat;background-position:left 16px center}
+  .btn{width:100%;padding:17px;border:none;border-radius:14px;cursor:pointer;
+    background:linear-gradient(135deg,var(--gold),#b8912b);color:#0a1a33;font-weight:800;font-size:19px;
+    font-family:inherit;box-shadow:0 10px 24px rgba(212,175,55,.28);margin-top:4px}
+  .btn:active{transform:translateY(1px)}
+  .btn[disabled]{opacity:.55}
+  .btn2{background:transparent;border:1px solid var(--line);color:var(--gold-soft);box-shadow:none;font-size:17px}
+  .btn-wa{background:linear-gradient(135deg,#3ad08a,#1f9c63);color:#04261a;box-shadow:0 10px 24px rgba(58,208,138,.22)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  .err{background:rgba(220,80,80,.12);border:1px solid rgba(220,80,80,.5);color:#f2a3a3;
+    padding:15px;border-radius:12px;text-align:center;font-weight:700;margin-top:18px;display:none}
+  .hint{color:var(--muted);font-size:13.5px;margin-top:12px;text-align:center}
+  .result{display:none}
+  .result h2{font-size:19px;margin:0 0 4px;color:var(--gold-soft)}
+  .result .for{color:var(--muted);font-size:14px;margin-bottom:16px}
+  .link{background:#0b1e3b;border:1px solid var(--line);border-radius:14px;padding:15px;
+    font-size:14.5px;direction:ltr;text-align:left;word-break:break-all;color:#cfe0f7;line-height:1.6}
+  .badge{display:inline-block;padding:4px 11px;border-radius:999px;background:rgba(212,175,55,.12);
+    border:1px solid var(--line);color:var(--gold-soft);font-size:12.5px;font-weight:700;margin-bottom:14px}
+  .foot{text-align:center;color:var(--muted);font-size:12px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><div class="mark">O</div><div class="name">COACH OFEK</div></div>
+  <h1>הכנת דף שקילות</h1>
+  <p class="sub">בוחרים לקוח, לוחצים — ומקבלים קישור מוכן לשליחה</p>
+
+  <div class="card" id="form-card">
+    <div class="field">
+      <label>בחירת לקוח</label>
+      <select id="client"><option value="">טוען רשימה…</option></select>
+    </div>
+    <button id="go" class="btn" disabled>תכין דף שקילות יומיות</button>
+    <div id="err" class="err"></div>
+    <p class="hint" id="hint"></p>
+  </div>
+
+  <div class="card result" id="result">
+    <div id="badge" class="badge"></div>
+    <h2>הקישור מוכן</h2>
+    <div class="for" id="for-who"></div>
+    <div class="link" id="link"></div>
+    <button id="wa" class="btn btn-wa" style="margin-top:14px">שליחה בוואטסאפ</button>
+    <div class="row">
+      <button id="copy" class="btn btn2">העתקת הקישור</button>
+      <button id="open" class="btn btn2">פתיחת הדף</button>
+    </div>
+    <div class="row" style="grid-template-columns:1fr">
+      <button id="again" class="btn btn2">לקוח נוסף</button>
+    </div>
+  </div>
+
+  <p class="foot">הקישור אחד לשניכם — הלקוח ממלא בו, ואתה רואה בו את הטבלה והגרף</p>
+</div>
+<script>
+  var API='https://xcvqxvokkqrvdtwoiyen.supabase.co/functions/v1/weighin';
+  var BASE=location.href.replace(/\/[^\/]*$/,'/');
+  var KEY=new URLSearchParams(location.search).get('k')||'';
+
+  var sel=document.getElementById('client');
+  var go=document.getElementById('go');
+  var err=document.getElementById('err');
+  var hint=document.getElementById('hint');
+  var result=document.getElementById('result');
+  var formCard=document.getElementById('form-card');
+  var linkEl=document.getElementById('link');
+  var clients=[];
+  var currentLink='';
+  var currentName='';
+
+  function showErr(msg){err.textContent=msg;err.style.display='block';}
+  function clearErr(){err.style.display='none';}
+
+  if(!KEY){showErr('הקישור אינו תקין — חסר המפתח');}
+
+  function loadClients(){
+    fetch(API+'?action=clients&admin='+encodeURIComponent(KEY))
+      .then(function(r){
+        if(r.status===401){throw new Error('המפתח בקישור שגוי');}
+        return r.json();
+      })
+      .then(function(d){
+        clients=d.clients||[];
+        var html='<option value="">— בחר לקוח —</option>';
+        for(var i=0;i<clients.length;i++){
+          var c=clients[i];
+          var mark=c.existing?' ✓':'';
+          html+='<option value="'+c.id+'">'+esc(c.name)+mark+'</option>';
+        }
+        sel.innerHTML=html;
+        hint.textContent='✓ = כבר קיים לו דף. בחירה בו תחזיר את הקישור הקיים, בלי ליצור חדש.';
+      })
+      .catch(function(e){
+        sel.innerHTML='<option value="">לא נטען</option>';
+        showErr(e.message||'לא הצלחתי לטעון את רשימת הלקוחות');
+      });
+  }
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+  sel.addEventListener('change',function(){
+    go.disabled=!sel.value;
+    clearErr();
+  });
+
+  go.addEventListener('click',function(){
+    if(!sel.value)return;
+    clearErr();
+    go.disabled=true; go.textContent='מכין…';
+    fetch(API+'?action=create&admin='+encodeURIComponent(KEY),{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({profile_id:sel.value})
+    })
+    .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+    .then(function(res){
+      go.disabled=false; go.textContent='תכין דף שקילות יומיות';
+      if(!res.ok){showErr('משהו השתבש, נסה שוב');return;}
+      show(res.j);
+    })
+    .catch(function(){
+      go.disabled=false; go.textContent='תכין דף שקילות יומיות';
+      showErr('אין חיבור, נסה שוב');
+    });
+  });
+
+  function show(t){
+    currentName=t.client_name;
+    var badge=document.getElementById('badge');
+    if(t.combined_slug){
+      currentLink=BASE+'m.html?k='+t.combined_slug;
+      linkEl.textContent=currentLink;
+    } else {
+      // Legacy client (separate submit / view links) - show both, don't break them.
+      currentLink=BASE+'w.html?k='+t.submit_slug;
+      linkEl.innerHTML='<b>ללקוח:</b><br>'+esc(BASE+'w.html?k='+t.submit_slug)+
+        '<br><br><b>למעקב שלך:</b><br>'+esc(BASE+'c.html?k='+t.view_slug);
+    }
+    badge.textContent=t.existed?'דף קיים — זה הקישור שכבר נשלח':'נוצר עכשיו דף חדש';
+    document.getElementById('for-who').textContent='עבור '+t.client_name;
+    formCard.style.display='none';
+    result.style.display='block';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  document.getElementById('copy').addEventListener('click',function(){
+    var btn=this;
+    navigator.clipboard.writeText(currentLink).then(function(){
+      btn.textContent='הועתק ✓';
+      setTimeout(function(){btn.textContent='העתקת הקישור';},1800);
+    }).catch(function(){
+      btn.textContent='ההעתקה נכשלה';
+      setTimeout(function(){btn.textContent='העתקת הקישור';},1800);
+    });
+  });
+
+  document.getElementById('open').addEventListener('click',function(){
+    window.open(currentLink,'_blank');
+  });
+
+  document.getElementById('wa').addEventListener('click',function(){
+    var msg='היי '+currentName.split(' ')[0]+', זה הקישור לשקילות היומיות שלך:\n'+currentLink;
+    window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  });
+
+  document.getElementById('again').addEventListener('click',function(){
+    result.style.display='none';
+    formCard.style.display='block';
+    sel.value=''; go.disabled=true;
+    loadClients();
+  });
+
+  if(KEY)loadClients();
+</script>
+</body>
+</html>
