@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>היעדים שלי — Coach Ofek</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --card:#12294d; --card2:#0f2244; --gold:#d4af37; --gold-soft:#e6c964;
+    --ink:#eaf1fb; --muted:#9db2d4; --line:rgba(212,175,55,.25); --green:#3ad08a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Heebo',system-ui,'Segoe UI',Arial,sans-serif;
+    background:radial-gradient(1200px 700px at 50% -10%, #123057 0%, #0a1a33 55%, #071223 100%);
+    color:var(--ink); min-height:100vh; direction:rtl; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:30px 18px 60px}
+  .brand{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:22px}
+  .brand .mark{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--gold),#b8912b);
+    display:flex;align-items:center;justify-content:center;color:#0a1a33;font-weight:800;font-size:20px;
+    box-shadow:0 6px 18px rgba(212,175,55,.3)}
+  .brand .name{font-weight:800;letter-spacing:.4px;font-size:15px;color:var(--gold-soft)}
+  h1{font-size:27px;font-weight:800;text-align:center;margin:6px 0 2px}
+  .sub{text-align:center;color:var(--muted);font-size:15px;margin:0 0 22px}
+  .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
+    border-radius:22px;padding:20px;box-shadow:0 18px 50px rgba(0,0,0,.35);margin-bottom:18px}
+  .sect{font-size:14px;color:var(--gold-soft);font-weight:800;margin:0 0 14px;display:flex;
+    align-items:center;justify-content:space-between}
+  .sect .note{color:var(--muted);font-weight:500;font-size:12px}
+
+  /* week strip */
+  .weekbar{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+  .nav{flex:0 0 auto;width:38px;height:38px;border-radius:12px;border:1px solid var(--line);
+    background:var(--card2);color:var(--gold-soft);font-size:18px;font-weight:800;cursor:pointer;
+    font-family:inherit;display:flex;align-items:center;justify-content:center}
+  .nav[disabled]{opacity:.3}
+  .range{flex:1;text-align:center;font-size:13px;color:var(--muted);font-weight:700}
+  .days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .day{background:var(--card2);border:1px solid rgba(157,178,212,.18);border-radius:14px;
+    padding:9px 2px 8px;text-align:center;cursor:pointer;position:relative;font-family:inherit;color:var(--ink)}
+  .day .dn{font-size:12px;color:var(--muted);font-weight:700}
+  .day .dd{font-size:15px;font-weight:800;margin-top:2px}
+  .day .bar{height:4px;border-radius:99px;background:rgba(157,178,212,.18);margin:7px 5px 0;overflow:hidden}
+  .day .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-soft));width:0}
+  .day.full .bar i{background:var(--green)}
+  .day.sel{border-color:var(--gold);box-shadow:0 0 0 2px rgba(212,175,55,.25)}
+  .day.today .dn{color:var(--gold-soft)}
+  .day.future{opacity:.45}
+
+  /* goal rows */
+  .goal{display:flex;align-items:center;gap:12px;padding:14px 4px;border-bottom:1px solid rgba(157,178,212,.12)}
+  .goal:last-child{border-bottom:none}
+  .goal .txt{flex:1;min-width:0}
+  .goal .lbl{font-size:16px;font-weight:700;line-height:1.3}
+  .goal .hint{font-size:12px;color:var(--muted);margin-top:2px}
+  .tick{flex:0 0 auto;width:34px;height:34px;border-radius:50%;border:2px solid rgba(157,178,212,.35);
+    background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    color:transparent;font-size:18px;font-weight:800;font-family:inherit;transition:.15s}
+  .tick.on{background:var(--green);border-color:var(--green);color:#07241a}
+  .step{flex:0 0 auto;display:flex;align-items:center;gap:6px}
+  .step button{width:34px;height:34px;border-radius:11px;border:1px solid var(--line);background:var(--card2);
+    color:var(--gold-soft);font-size:20px;font-weight:800;cursor:pointer;font-family:inherit;line-height:1}
+  .step input{width:74px;height:34px;border-radius:11px;border:1px solid rgba(157,178,212,.25);
+    background:#0b1e3b;color:var(--ink);font-size:16px;font-weight:800;font-family:inherit;text-align:center;outline:none}
+  .step input:focus{border-color:var(--gold)}
+  .goal.done .lbl{color:#bff0d8}
+
+  /* weekly rings */
+  .rings{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .ring{text-align:center}
+  .ring svg{width:92px;height:92px;margin:0 auto;display:block}
+  .ring .val{font-size:17px;font-weight:800;fill:var(--ink)}
+  .ring .of{font-size:9px;fill:var(--muted)}
+  .ring .rl{font-size:13px;font-weight:700;margin-top:8px;line-height:1.25}
+  .ring .rs{font-size:11px;color:var(--muted);margin-top:2px}
+  .ring.met .rl{color:#bff0d8}
+
+  .save{position:fixed;bottom:18px;right:50%;transform:translateX(50%);background:rgba(46,160,110,.92);
+    color:#fff;padding:10px 20px;border-radius:999px;font-weight:800;font-size:14px;opacity:0;
+    transition:.25s;pointer-events:none;box-shadow:0 8px 22px rgba(0,0,0,.4)}
+  .save.show{opacity:1}
+  .empty{text-align:center;color:var(--muted);padding:26px 10px}
+  .foot{text-align:center;color:var(--muted);font-size:12px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><div class="mark">O</div><div class="name">COACH OFEK</div></div>
+  <h1>היעדים שלי</h1>
+  <p class="sub" id="who">&nbsp;</p>
+
+  <div class="card">
+    <div class="weekbar">
+      <button class="nav" id="prev" title="שבוע קודם">›</button>
+      <div class="range" id="range">&nbsp;</div>
+      <button class="nav" id="next" title="שבוע הבא">‹</button>
+    </div>
+    <div class="days" id="days"></div>
+  </div>
+
+  <div class="card">
+    <div class="sect"><span id="dayTitle">היעדים של היום</span><span class="note">נשמר אוטומטית</span></div>
+    <div id="goals"><div class="empty">טוען…</div></div>
+  </div>
+
+  <div class="card">
+    <div class="sect"><span>הקצב השבועי</span><span class="note" id="weekNote">&nbsp;</span></div>
+    <div class="rings" id="rings"></div>
+  </div>
+
+  <p class="foot">השבוע מתחיל ביום ראשון ומתאפס לבד · אפשר לחזור ולעדכן ימים קודמים</p>
+</div>
+<div class="save" id="saved">נשמר</div>
+
+<script>
+var API='https://xcvqxvokkqrvdtwoiyen.supabase.co/functions/v1/goals';
+var SLUG=new URLSearchParams(location.search).get('k')||'';
+var DAY_SHORT=['א','ב','ג','ד','ה','ו','ש'];
+var state={start:'',daily:[],weekly:[],days:{},sel:'',role:'client'};
+
+// Everything is anchored to the client's own calendar day in Israel, so a late
+// night tick still lands on the right date.
+function todayStr(){
+  return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+}
+function addDays(d,n){var x=new Date(d+'T00:00:00Z');x.setUTCDate(x.getUTCDate()+n);return x.toISOString().slice(0,10);}
+function dm(d){var p=d.split('-');return p[2]+'.'+p[1];}
+function dow(d){return new Date(d+'T00:00:00Z').getUTCDay();}
+
+function load(start){
+  var q=API+'?action=week&slug='+encodeURIComponent(SLUG)+'&today='+todayStr()+(start?'&start='+start:'');
+  fetch(q).then(function(r){return r.json()}).then(function(d){
+    if(d.error){document.getElementById('goals').innerHTML='<div class="empty">הקישור לא תקין</div>';return;}
+    state.start=d.start; state.daily=d.daily_goals||[]; state.weekly=d.weekly_goals||[]; state.role=d.role;
+    state.days={};
+    (d.days||[]).forEach(function(r){state.days[r.day]={checks:r.checks||{},note:r.note||''};});
+    document.getElementById('who').textContent=d.client_name;
+    var t=todayStr();
+    // Land on today when the shown week contains it, otherwise on its first day.
+    state.sel=(t>=d.start&&t<=addDays(d.start,6))?t:d.start;
+    render();
+  }).catch(function(){document.getElementById('goals').innerHTML='<div class="empty">אין חיבור לאינטרנט</div>';});
+}
+
+function checksOf(day){return (state.days[day]&&state.days[day].checks)||{};}
+
+// A daily goal counts as met when a number reaches its target, or a tick is on.
+function metDay(goal,day,override){
+  var v=checksOf(day)[goal.id];
+  if(goal.type==='number'){var t=override!=null?override:goal.target;return Number(v||0)>=t;}
+  return v===true;
+}
+function valDay(goal,day){
+  var v=checksOf(day)[goal.id];
+  if(goal.type==='number')return Number(v||0);
+  return v===true?1:0;
+}
+function dayProgress(day){
+  if(!state.daily.length)return 0;
+  var n=0;state.daily.forEach(function(g){if(metDay(g,day))n++;});
+  return n/state.daily.length;
+}
+
+function renderDays(){
+  var box=document.getElementById('days');box.innerHTML='';
+  var t=todayStr();
+  for(var i=0;i<7;i++){
+    (function(){
+      var d=addDays(state.start,i);
+      var p=dayProgress(d);
+      var el=document.createElement('button');
+      el.className='day'+(d===state.sel?' sel':'')+(d===t?' today':'')+(p>=1?' full':'')+(d>t?' future':'');
+      el.innerHTML='<div class="dn">'+DAY_SHORT[dow(d)]+'</div><div class="dd">'+dm(d)+'</div>'+
+                   '<div class="bar"><i style="width:'+Math.round(p*100)+'%"></i></div>';
+      el.onclick=function(){state.sel=d;render();};
+      box.appendChild(el);
+    })();
+  }
+  document.getElementById('range').textContent=dm(state.start)+' – '+dm(addDays(state.start,6));
+  document.getElementById('next').disabled=addDays(state.start,7)>todayStr();
+}
+
+function renderGoals(){
+  var box=document.getElementById('goals');box.innerHTML='';
+  var t=todayStr();
+  document.getElementById('dayTitle').textContent=
+    state.sel===t?'היעדים של היום':('היעדים של '+dm(state.sel));
+  if(!state.daily.length){box.innerHTML='<div class="empty">עוד לא הוגדרו יעדים</div>';return;}
+  state.daily.forEach(function(g){
+    var row=document.createElement('div');
+    row.className='goal'+(metDay(g,state.sel)?' done':'');
+    var txt='<div class="txt"><div class="lbl">'+esc(g.label)+'</div>'+
+            (g.type==='number'?'<div class="hint">היעד: '+fmt(g.target)+' '+esc(g.unit||'')+'</div>':'')+
+            '</div>';
+    if(g.type==='number'){
+      var v=valDay(g,state.sel);
+      row.innerHTML=txt+'<div class="step"><button data-a="minus">−</button>'+
+        '<input type="text" inputmode="numeric" value="'+(v||'')+'" placeholder="0" />'+
+        '<button data-a="plus">+</button></div>';
+      var inp=row.querySelector('input');
+      var stepBy=g.target>=100?500:1;
+      row.querySelector('[data-a="minus"]').onclick=function(){setVal(g,Math.max(0,num(inp.value)-stepBy));};
+      row.querySelector('[data-a="plus"]').onclick=function(){setVal(g,num(inp.value)+stepBy);};
+      inp.onchange=function(){setVal(g,Math.max(0,num(inp.value)));};
+    }else{
+      var on=metDay(g,state.sel);
+      row.innerHTML=txt+'<button class="tick'+(on?' on':'')+'">✓</button>';
+      row.querySelector('.tick').onclick=function(){setVal(g,on?0:1);};
+    }
+    box.appendChild(row);
+  });
+}
+
+function num(s){var n=parseFloat(String(s).replace(/[^\d.]/g,''));return isFinite(n)?n:0;}
+function fmt(n){return Number(n).toLocaleString('he-IL');}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+function setVal(goal,v){
+  var day=state.sel;
+  if(!state.days[day])state.days[day]={checks:{},note:''};
+  var c=state.days[day].checks;
+  if(goal.type==='number'){ if(v>0)c[goal.id]=v; else delete c[goal.id]; }
+  else { if(v)c[goal.id]=true; else delete c[goal.id]; }
+  render();
+  save(day);
+}
+
+var saveTimer=null;
+function save(day){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(function(){
+    fetch(API+'?action=save',{method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify({slug:SLUG,day:day,checks:checksOf(day),note:(state.days[day]||{}).note||null})})
+      .then(function(r){return r.json()}).then(function(d){ if(d.ok)flash(); });
+  },400);
+}
+function flash(){
+  var el=document.getElementById('saved');el.classList.add('show');
+  setTimeout(function(){el.classList.remove('show');},1200);
+}
+
+// current/target for one weekly goal, reduced from the seven daily rows.
+function weekStat(w){
+  var g=null;state.daily.forEach(function(x){if(x.id===w.source)g=x;});
+  if(!g)return null;
+  var cur=0,target=w.target||0,label='';
+  for(var i=0;i<7;i++){
+    var d=addDays(state.start,i);
+    if(w.mode==='sum')cur+=valDay(g,d);
+    else if(w.mode==='count'){if(metDay(g,d))cur++;}
+    else {if(metDay(g,d,w.target))cur++;}
+  }
+  if(w.mode==='everyday')target=7;
+  label=w.mode==='sum'?(fmt(Math.round(cur))+' / '+fmt(target)):(cur+' / '+target);
+  return {cur:cur,target:target,label:label,pct:target?Math.min(1,cur/target):0,
+          unit:w.mode==='sum'?(g.unit||''):(w.mode==='everyday'?'ימים':'פעמים')};
+}
+
+function renderRings(){
+  var box=document.getElementById('rings');box.innerHTML='';
+  if(!state.weekly.length){box.innerHTML='<div class="empty" style="grid-column:1/-1">עוד לא הוגדרו יעדים שבועיים</div>';return;}
+  var met=0;
+  state.weekly.forEach(function(w){
+    var s=weekStat(w);if(!s)return;
+    if(s.pct>=1)met++;
+    var R=40,C=2*Math.PI*R,off=C*(1-s.pct);
+    var col=s.pct>=1?'#3ad08a':'#d4af37';
+    var el=document.createElement('div');
+    el.className='ring'+(s.pct>=1?' met':'');
+    el.innerHTML=
+      '<svg viewBox="0 0 100 100"><g transform="rotate(-90 50 50)">'+
+      '<circle cx="50" cy="50" r="'+R+'" fill="none" stroke="rgba(157,178,212,.18)" stroke-width="9"/>'+
+      '<circle cx="50" cy="50" r="'+R+'" fill="none" stroke="'+col+'" stroke-width="9" stroke-linecap="round" '+
+      'stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'"/></g>'+
+      '<text class="val" x="50" y="52" text-anchor="middle">'+Math.round(s.pct*100)+'%</text>'+
+      '<text class="of" x="50" y="66" text-anchor="middle">'+esc(s.label)+'</text></svg>'+
+      '<div class="rl">'+esc(w.label)+'</div>'+
+      '<div class="rs">'+esc(s.label)+' '+esc(s.unit)+'</div>';
+    box.appendChild(el);
+  });
+  document.getElementById('weekNote').textContent=met+' מתוך '+state.weekly.length+' הושלמו';
+}
+
+function render(){renderDays();renderGoals();renderRings();}
+
+document.getElementById('prev').onclick=function(){load(addDays(state.start,-7));};
+document.getElementById('next').onclick=function(){load(addDays(state.start,7));};
+
+if(!SLUG)document.getElementById('goals').innerHTML='<div class="empty">חסר קישור אישי</div>';
+else load('');
+</script>
+</body>
+</html>

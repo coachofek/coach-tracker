@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>מעקב יעדים — Coach Ofek</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --card:#12294d; --card2:#0f2244; --gold:#d4af37; --gold-soft:#e6c964;
+    --ink:#eaf1fb; --muted:#9db2d4; --line:rgba(212,175,55,.25); --green:#3ad08a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Heebo',system-ui,'Segoe UI',Arial,sans-serif;
+    background:radial-gradient(1200px 700px at 50% -10%, #123057 0%, #0a1a33 55%, #071223 100%);
+    color:var(--ink); min-height:100vh; direction:rtl; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px;margin:0 auto;padding:30px 18px 60px}
+  .brand{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:22px}
+  .brand .mark{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--gold),#b8912b);
+    display:flex;align-items:center;justify-content:center;color:#0a1a33;font-weight:800;font-size:20px;
+    box-shadow:0 6px 18px rgba(212,175,55,.3)}
+  .brand .name{font-weight:800;letter-spacing:.4px;font-size:15px;color:var(--gold-soft)}
+  h1{font-size:27px;font-weight:800;text-align:center;margin:6px 0 2px}
+  .sub{text-align:center;color:var(--muted);font-size:15px;margin:0 0 6px}
+  .live{display:inline-flex;align-items:center;gap:7px;color:#8fe3bd;font-size:13px;font-weight:700}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--green);animation:pulse 1.8s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(58,208,138,.55)}70%{box-shadow:0 0 0 10px rgba(58,208,138,0)}100%{box-shadow:0 0 0 0 rgba(58,208,138,0)}}
+  .center{text-align:center;margin-bottom:20px}
+  .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
+    border-radius:22px;padding:20px;box-shadow:0 18px 50px rgba(0,0,0,.35);margin-bottom:18px}
+  .sect{font-size:14px;color:var(--gold-soft);font-weight:800;margin:0 0 14px;display:flex;
+    align-items:center;justify-content:space-between;gap:10px}
+  .sect .note{color:var(--muted);font-weight:500;font-size:12px}
+
+  .weekbar{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+  .nav{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--card2);
+    color:var(--gold-soft);font-size:18px;font-weight:800;cursor:pointer;font-family:inherit;
+    display:flex;align-items:center;justify-content:center}
+  .nav[disabled]{opacity:.3}
+  .range{flex:1;text-align:center;font-size:14px;color:var(--muted);font-weight:700}
+
+  .grid{width:100%;border-collapse:collapse;font-size:14px}
+  .grid th{color:var(--gold-soft);font-weight:700;padding:9px 4px;border-bottom:1px solid var(--line);font-size:12px;text-align:center}
+  .grid th.g{text-align:right;width:44%}
+  .grid td{padding:11px 4px;border-bottom:1px solid rgba(157,178,212,.12);text-align:center}
+  .grid td.g{text-align:right;font-weight:700}
+  .grid tr:last-child td{border-bottom:none}
+  .grid th.today{color:#fff;background:rgba(212,175,55,.12);border-radius:8px 8px 0 0}
+  .v{display:inline-block;min-width:28px;padding:3px 7px;border-radius:8px;font-weight:800;font-size:13px}
+  .v.ok{background:rgba(58,208,138,.18);color:#8fe3bd}
+  .v.part{background:rgba(212,175,55,.15);color:var(--gold-soft)}
+  .v.no{color:rgba(157,178,212,.45)}
+
+  .rings{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:620px){.rings{grid-template-columns:repeat(2,1fr)}}
+  .ring{text-align:center}
+  .ring svg{width:92px;height:92px;margin:0 auto;display:block}
+  .ring .val{font-size:17px;font-weight:800;fill:var(--ink)}
+  .ring .of{font-size:9px;fill:var(--muted)}
+  .ring .rl{font-size:13px;font-weight:700;margin-top:8px;line-height:1.25}
+  .ring .rs{font-size:11px;color:var(--muted);margin-top:2px}
+  .ring.met .rl{color:#bff0d8}
+
+  /* editor */
+  .row{display:flex;gap:8px;align-items:center;margin-bottom:9px;flex-wrap:wrap}
+  .row input,.row select{padding:11px;border-radius:11px;border:1px solid rgba(157,178,212,.25);
+    background:#0b1e3b;color:var(--ink);font-size:15px;font-family:inherit;outline:none}
+  .row input:focus,.row select:focus{border-color:var(--gold)}
+  .row .lbl{flex:1;min-width:170px}
+  .row .sm{width:96px}
+  .row .md{width:140px}
+  .del{width:38px;height:38px;flex:0 0 auto;border-radius:11px;border:1px solid rgba(220,80,80,.4);
+    background:rgba(220,80,80,.12);color:#f2a3a3;font-size:17px;font-weight:800;cursor:pointer;font-family:inherit}
+  .add{border:1px dashed var(--line);background:transparent;color:var(--gold-soft);padding:11px 16px;
+    border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;margin-top:4px}
+  .btn{padding:15px;border:none;border-radius:14px;cursor:pointer;width:100%;margin-top:14px;
+    background:linear-gradient(135deg,var(--gold),#b8912b);color:#0a1a33;font-weight:800;font-size:17px;font-family:inherit}
+  .btn[disabled]{opacity:.6}
+  .toggle{border:1px solid var(--line);background:var(--card2);color:var(--gold-soft);padding:8px 14px;
+    border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}
+  #editor{display:none}
+  .msg{padding:13px;border-radius:12px;text-align:center;font-weight:700;margin-top:12px;display:none}
+  .msg.ok{background:rgba(46,160,110,.15);border:1px solid rgba(46,160,110,.5);color:#8fe3bd}
+  .msg.err{background:rgba(220,80,80,.12);border:1px solid rgba(220,80,80,.5);color:#f2a3a3}
+  .empty{text-align:center;color:var(--muted);padding:26px 10px}
+  .foot{text-align:center;color:var(--muted);font-size:12px;margin-top:22px}
+  .hint{color:var(--muted);font-size:12px;margin:0 0 12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><div class="mark">O</div><div class="name">COACH OFEK</div></div>
+  <h1>מעקב יעדים</h1>
+  <p class="sub" id="who">&nbsp;</p>
+  <div class="center"><span class="live"><span class="dot"></span>מתעדכן בזמן אמת</span></div>
+
+  <div class="card">
+    <div class="weekbar">
+      <button class="nav" id="prev" title="שבוע קודם">›</button>
+      <div class="range" id="range">&nbsp;</div>
+      <button class="nav" id="next" title="שבוע הבא">‹</button>
+    </div>
+    <table class="grid">
+      <thead><tr id="head"></tr></thead>
+      <tbody id="body"><tr><td class="empty" colspan="8">טוען…</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="sect"><span>הקצב השבועי</span><span class="note" id="weekNote">&nbsp;</span></div>
+    <div class="rings" id="rings"></div>
+  </div>
+
+  <div class="card">
+    <div class="sect"><span>היעדים שלה</span><button class="toggle" id="toggle">עריכה</button></div>
+    <div id="summary"></div>
+    <div id="editor">
+      <p class="hint">יעד יומי מסוג "כמות" נספר במספרים (צעדים, מנות). מסוג "סימון" הוא וי פשוט.</p>
+      <div id="dailyRows"></div>
+      <button class="add" id="addDaily">+ הוספת יעד יומי</button>
+
+      <div class="sect" style="margin:24px 0 10px"><span>יעדים שבועיים</span></div>
+      <p class="hint">כל יעד שבועי מחושב לבד מיעד יומי: סכום (סה"כ צעדים), ספירה (כמה ימים בוצע) או כל יום (7 מתוך 7).</p>
+      <div id="weeklyRows"></div>
+      <button class="add" id="addWeekly">+ הוספת יעד שבועי</button>
+
+      <button class="btn" id="save">שמירת היעדים</button>
+      <div class="msg ok" id="ok">היעדים נשמרו</div>
+      <div class="msg err" id="err">משהו השתבש, נסה שוב</div>
+    </div>
+  </div>
+
+  <p class="foot">השבוע מתחיל ביום ראשון · הקישור הזה הוא שלך בלבד</p>
+</div>
+
+<script>
+var API='https://xcvqxvokkqrvdtwoiyen.supabase.co/functions/v1/goals';
+var SLUG=new URLSearchParams(location.search).get('k')||'';
+var DAY_SHORT=['א','ב','ג','ד','ה','ו','ש'];
+var state={start:'',daily:[],weekly:[],days:{}};
+var editing=false;
+
+function todayStr(){
+  return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+}
+function addDays(d,n){var x=new Date(d+'T00:00:00Z');x.setUTCDate(x.getUTCDate()+n);return x.toISOString().slice(0,10);}
+function dm(d){var p=d.split('-');return p[2]+'.'+p[1];}
+function dow(d){return new Date(d+'T00:00:00Z').getUTCDay();}
+function fmt(n){return Number(n).toLocaleString('he-IL');}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+function load(start){
+  var q=API+'?action=week&slug='+encodeURIComponent(SLUG)+'&today='+todayStr()+(start?'&start='+start:'');
+  return fetch(q).then(function(r){return r.json()}).then(function(d){
+    if(d.error){document.getElementById('body').innerHTML='<tr><td class="empty" colspan="8">הקישור לא תקין</td></tr>';return;}
+    if(d.role!=='coach'){document.getElementById('body').innerHTML='<tr><td class="empty" colspan="8">זה קישור של הלקוחה, לא של המאמן</td></tr>';return;}
+    state.start=d.start; state.daily=d.daily_goals||[]; state.weekly=d.weekly_goals||[];
+    state.days={};
+    (d.days||[]).forEach(function(r){state.days[r.day]={checks:r.checks||{}};});
+    document.getElementById('who').textContent=d.client_name;
+    render();
+  });
+}
+
+function checksOf(day){return (state.days[day]&&state.days[day].checks)||{};}
+function metDay(goal,day,override){
+  var v=checksOf(day)[goal.id];
+  if(goal.type==='number'){var t=override!=null?override:goal.target;return Number(v||0)>=t;}
+  return v===true;
+}
+function valDay(goal,day){
+  var v=checksOf(day)[goal.id];
+  if(goal.type==='number')return Number(v||0);
+  return v===true?1:0;
+}
+
+function renderGrid(){
+  var t=todayStr();
+  var head='<th class="g">יעד יומי</th>';
+  for(var i=0;i<7;i++){
+    var d=addDays(state.start,i);
+    head+='<th'+(d===t?' class="today"':'')+'>'+DAY_SHORT[dow(d)]+'<br><span style="font-weight:400;color:var(--muted)">'+dm(d)+'</span></th>';
+  }
+  document.getElementById('head').innerHTML=head;
+  document.getElementById('range').textContent=dm(state.start)+' – '+dm(addDays(state.start,6));
+  document.getElementById('next').disabled=addDays(state.start,7)>t;
+
+  var body=document.getElementById('body');
+  if(!state.daily.length){body.innerHTML='<tr><td class="empty" colspan="8">לא הוגדרו יעדים</td></tr>';return;}
+  var html='';
+  state.daily.forEach(function(g){
+    html+='<tr><td class="g">'+esc(g.label)+'</td>';
+    for(var i=0;i<7;i++){
+      var d=addDays(state.start,i);
+      var raw=checksOf(d)[g.id];
+      var cls='no',txt='—';
+      if(g.type==='number'){
+        var n=Number(raw||0);
+        if(n>0){txt=fmt(n);cls=n>=g.target?'ok':'part';}
+      }else if(raw===true){txt='✓';cls='ok';}
+      html+='<td><span class="v '+cls+'">'+txt+'</span></td>';
+    }
+    html+='</tr>';
+  });
+  body.innerHTML=html;
+}
+
+function weekStat(w){
+  var g=null;state.daily.forEach(function(x){if(x.id===w.source)g=x;});
+  if(!g)return null;
+  var cur=0,target=w.target||0;
+  for(var i=0;i<7;i++){
+    var d=addDays(state.start,i);
+    if(w.mode==='sum')cur+=valDay(g,d);
+    else if(w.mode==='count'){if(metDay(g,d))cur++;}
+    else {if(metDay(g,d,w.target))cur++;}
+  }
+  if(w.mode==='everyday')target=7;
+  var label=w.mode==='sum'?(fmt(Math.round(cur))+' / '+fmt(target)):(cur+' / '+target);
+  return {cur:cur,target:target,label:label,pct:target?Math.min(1,cur/target):0,
+          unit:w.mode==='sum'?(g.unit||''):(w.mode==='everyday'?'ימים':'פעמים')};
+}
+
+function renderRings(){
+  var box=document.getElementById('rings');box.innerHTML='';
+  if(!state.weekly.length){box.innerHTML='<div class="empty" style="grid-column:1/-1">לא הוגדרו יעדים שבועיים</div>';
+    document.getElementById('weekNote').textContent='';return;}
+  var met=0;
+  state.weekly.forEach(function(w){
+    var s=weekStat(w);if(!s)return;
+    if(s.pct>=1)met++;
+    var R=40,C=2*Math.PI*R,off=C*(1-s.pct);
+    var col=s.pct>=1?'#3ad08a':'#d4af37';
+    var el=document.createElement('div');
+    el.className='ring'+(s.pct>=1?' met':'');
+    el.innerHTML=
+      '<svg viewBox="0 0 100 100"><g transform="rotate(-90 50 50)">'+
+      '<circle cx="50" cy="50" r="'+R+'" fill="none" stroke="rgba(157,178,212,.18)" stroke-width="9"/>'+
+      '<circle cx="50" cy="50" r="'+R+'" fill="none" stroke="'+col+'" stroke-width="9" stroke-linecap="round" '+
+      'stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'"/></g>'+
+      '<text class="val" x="50" y="52" text-anchor="middle">'+Math.round(s.pct*100)+'%</text>'+
+      '<text class="of" x="50" y="66" text-anchor="middle">'+esc(s.label)+'</text></svg>'+
+      '<div class="rl">'+esc(w.label)+'</div>'+
+      '<div class="rs">'+esc(s.label)+' '+esc(s.unit)+'</div>';
+    box.appendChild(el);
+  });
+  document.getElementById('weekNote').textContent=met+' מתוך '+state.weekly.length+' הושלמו';
+}
+
+function renderSummary(){
+  var box=document.getElementById('summary');
+  if(editing){box.innerHTML='';return;}
+  var h='<div style="font-size:14px;line-height:2">';
+  state.daily.forEach(function(g){
+    h+='<div>• '+esc(g.label)+(g.type==='number'?' <span style="color:var(--muted)">('+fmt(g.target)+' '+esc(g.unit||'')+')</span>':'')+'</div>';
+  });
+  h+='</div>';
+  box.innerHTML=h;
+}
+
+// ---- goal editor ----
+function slugId(){return 'g'+Math.random().toString(36).slice(2,9);}
+
+function dailyRow(g){
+  var el=document.createElement('div');
+  el.className='row';
+  el.dataset.id=g.id;
+  el.innerHTML=
+    '<input class="lbl" placeholder="שם היעד" value="'+esc(g.label||'')+'" />'+
+    '<select class="md"><option value="check">סימון</option><option value="number">כמות</option></select>'+
+    '<input class="sm num" type="text" inputmode="numeric" placeholder="יעד" value="'+(g.target||'')+'" />'+
+    '<input class="sm unit" placeholder="יחידה" value="'+esc(g.unit||'')+'" />'+
+    '<button class="del" title="מחיקה">×</button>';
+  var sel=el.querySelector('select');
+  sel.value=g.type==='number'?'number':'check';
+  function sync(){
+    var isNum=sel.value==='number';
+    el.querySelector('.num').style.display=isNum?'':'none';
+    el.querySelector('.unit').style.display=isNum?'':'none';
+  }
+  sel.onchange=function(){sync();refreshSources();};
+  el.querySelector('.lbl').oninput=refreshSources;
+  el.querySelector('.del').onclick=function(){el.remove();refreshSources();};
+  sync();
+  return el;
+}
+
+function weeklyRow(w){
+  var el=document.createElement('div');
+  el.className='row';
+  el.dataset.id=w.id;
+  el.innerHTML=
+    '<input class="lbl" placeholder="שם היעד השבועי" value="'+esc(w.label||'')+'" />'+
+    '<select class="md src"></select>'+
+    '<select class="md mode"><option value="sum">סכום</option><option value="count">ספירת ימים</option><option value="everyday">כל יום</option></select>'+
+    '<input class="sm num" type="text" inputmode="numeric" placeholder="יעד" value="'+(w.target||'')+'" />'+
+    '<button class="del" title="מחיקה">×</button>';
+  el.querySelector('.mode').value=w.mode||'sum';
+  el.dataset.src=w.source||'';
+  el.querySelector('.del').onclick=function(){el.remove();};
+  return el;
+}
+
+// Weekly goals point at a daily goal, so their dropdown is rebuilt whenever the
+// daily list changes (added, renamed or removed).
+function refreshSources(){
+  var opts=[];
+  document.querySelectorAll('#dailyRows .row').forEach(function(r){
+    opts.push({id:r.dataset.id,label:r.querySelector('.lbl').value||'(ללא שם)'});
+  });
+  document.querySelectorAll('#weeklyRows .row').forEach(function(r){
+    var sel=r.querySelector('.src');
+    var cur=sel.value||r.dataset.src||'';
+    sel.innerHTML=opts.map(function(o){return '<option value="'+esc(o.id)+'">'+esc(o.label)+'</option>';}).join('');
+    if(opts.some(function(o){return o.id===cur;}))sel.value=cur;
+    r.dataset.src=sel.value;
+    sel.onchange=function(){r.dataset.src=sel.value;};
+  });
+}
+
+function fillEditor(){
+  var dr=document.getElementById('dailyRows');dr.innerHTML='';
+  state.daily.forEach(function(g){dr.appendChild(dailyRow(g));});
+  var wr=document.getElementById('weeklyRows');wr.innerHTML='';
+  state.weekly.forEach(function(w){wr.appendChild(weeklyRow(w));});
+  refreshSources();
+}
+
+document.getElementById('addDaily').onclick=function(){
+  document.getElementById('dailyRows').appendChild(dailyRow({id:slugId(),type:'check'}));
+  refreshSources();
+};
+document.getElementById('addWeekly').onclick=function(){
+  document.getElementById('weeklyRows').appendChild(weeklyRow({id:slugId(),mode:'count'}));
+  refreshSources();
+};
+document.getElementById('toggle').onclick=function(){
+  editing=!editing;
+  document.getElementById('editor').style.display=editing?'block':'none';
+  this.textContent=editing?'סגירה':'עריכה';
+  if(editing)fillEditor();
+  renderSummary();
+};
+
+function num(s){var n=parseFloat(String(s).replace(/[^\d.]/g,''));return isFinite(n)?n:0;}
+
+document.getElementById('save').onclick=function(){
+  var btn=this;
+  document.getElementById('ok').style.display='none';
+  document.getElementById('err').style.display='none';
+  var daily=[],bad='';
+  document.querySelectorAll('#dailyRows .row').forEach(function(r){
+    var label=r.querySelector('.lbl').value.trim();
+    if(!label){bad='חסר שם ליעד יומי';return;}
+    var type=r.querySelector('select').value;
+    var g={id:r.dataset.id,label:label,type:type};
+    if(type==='number'){
+      g.target=num(r.querySelector('.num').value);
+      g.unit=r.querySelector('.unit').value.trim();
+      if(!g.target){bad='חסר מספר יעד ב"'+label+'"';return;}
+    }
+    daily.push(g);
+  });
+  var weekly=[];
+  document.querySelectorAll('#weeklyRows .row').forEach(function(r){
+    var label=r.querySelector('.lbl').value.trim();
+    if(!label){bad='חסר שם ליעד שבועי';return;}
+    var mode=r.querySelector('.mode').value;
+    var src=r.querySelector('.src').value;
+    if(!src){bad='ליעד "'+label+'" אין יעד יומי מקושר';return;}
+    var w={id:r.dataset.id,label:label,source:src,mode:mode};
+    var t=num(r.querySelector('.num').value);
+    if(mode==='everyday'){ if(t)w.target=t; }
+    else if(!t){bad='חסר מספר יעד ב"'+label+'"';return;}
+    else w.target=t;
+    weekly.push(w);
+  });
+  if(bad){var e=document.getElementById('err');e.textContent=bad;e.style.display='block';return;}
+
+  btn.disabled=true;
+  fetch(API+'?action=config',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({slug:SLUG,daily_goals:daily,weekly_goals:weekly})})
+    .then(function(r){return r.json()}).then(function(d){
+      btn.disabled=false;
+      if(d.ok){document.getElementById('ok').style.display='block';load(state.start);}
+      else{var e=document.getElementById('err');e.textContent='משהו השתבש, נסה שוב';e.style.display='block';}
+    }).catch(function(){
+      btn.disabled=false;
+      var e=document.getElementById('err');e.textContent='אין חיבור לאינטרנט';e.style.display='block';
+    });
+};
+
+function render(){renderGrid();renderRings();renderSummary();}
+
+document.getElementById('prev').onclick=function(){load(addDays(state.start,-7));};
+document.getElementById('next').onclick=function(){load(addDays(state.start,7));};
+
+if(!SLUG)document.getElementById('body').innerHTML='<tr><td class="empty" colspan="8">חסר קישור</td></tr>';
+else{
+  load('');
+  // Live view, but never yank the goal list out from under an open editor.
+  setInterval(function(){if(!editing)load(state.start);},15000);
+}
+</script>
+</body>
+</html>
